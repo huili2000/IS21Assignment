@@ -46,8 +46,7 @@ const Login = (props) => {
 
     // Call the server API to check if the user name already exists
     const checkAccountExists = (callback) => {
-        //fetch("http://localhost:3080/auth-user", {
-        fetch("https://painttest-33nsvrx5ka-uc.a.run.app/auth-user", { 
+        fetch("https://is21assignmentbe-ikc6zntdbq-wn.a.run.app/auth-user", { 
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -57,15 +56,14 @@ const Login = (props) => {
         .then(r => r.json())
         .then(r => {
             //callback(r?.userExists)
-           callback(r.painter.length >= 1)
+           callback(r.length >= 1)
         })
         .catch ((error) => console.error(error))
     }
 
     // Log in a user using email and password
     const logIn = () => {
-        //fetch("http://localhost:3080/auth-user", {
-            fetch("https://painttest-33nsvrx5ka-uc.a.run.app/auth-user", {  
+            fetch("https://is21assignmentbe-ikc6zntdbq-wn.a.run.app/auth-user", {  
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -75,15 +73,15 @@ const Login = (props) => {
         })
         .then(r => r.json())
         .then(r => {
-            if ('painter' === (r.painter)[0].role) {
-                props.setUserName((r.painter)[0].name)
-                props.setPermission((r.painter)[0].permission)
-                props.setRole((r.painter)[0].role)
+            if ('painter' === r[0].role) {
+                props.setUserName(r[0].name)
+                props.setPermission(r[0].permission)
+                props.setRole(r[0].role)
                 navigate("/stickyBoard")
             } else {
-                props.setUserName((r.painter)[0].name)
-                props.setPermission((r.painter)[0].permission)
-                props.setRole((r.painter)[0].role)
+                props.setUserName(r[0].name)
+                props.setPermission(r[0].permission)
+                props.setRole(r[0].role)
                 navigate("/userAdmin", props)
             }
         })

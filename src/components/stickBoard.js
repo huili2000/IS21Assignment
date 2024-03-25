@@ -26,7 +26,7 @@ const StickyBoard = (props) => {
    
     //call back end for stock inventory
     useEffect(() => {
-        fetch("http://localhost:3080/paints", {
+        fetch("https://is21assignmentbe-ikc6zntdbq-wn.a.run.app/paints", {
             method: "GET",
             headers: {
             'Content-Type': 'application/json'
@@ -35,10 +35,9 @@ const StickyBoard = (props) => {
     })
     .then(r => r.json())
     .then(r => {
-        if (0 < (r.paints).length) {
-            let receivedInventory = r.paints;
+        if (0 < (r.length) ){
             
-            receivedInventory = receivedInventory.map (obj => {
+           let listReceived = r.map (obj => {
                 if(obj.color === 'blue') {
                     return {...obj, cssClassName: "card release-1"}
                 } else if (obj.color === 'grey'){
@@ -47,26 +46,26 @@ const StickyBoard = (props) => {
                     return {...obj, cssClassName: "card release-3"}    
                 } else if (obj.color === 'white'){
                     return {...obj, cssClassName: "card release-4"}    
-                } else if (obj.color === 'purple'){
+                } else if (obj.color === 'purple') {
                     return {...obj, cssClassName: "card release-5"}    
-                }
+                } else return obj
             })
             
-            let listAvailableModified = receivedInventory.map(obj => {
+            let listAvailableModified = listReceived.map(obj => {
                 if (obj.quantity < 30) {
                     return { ...obj, cssClassName: "card0 release-0" };
                 }
                 return obj;
             });
 
-            let listLowModified = receivedInventory.map(obj => {
+            let listLowModified = listReceived.map(obj => {
                 if ((obj.quantity > 30) || (obj.quantity === 0) ) {
                     return { ...obj, cssClassName: "card0 release-0" };
                 }
                 return obj;
             });
 
-            let listOutOfStockModified = receivedInventory.map(obj => {
+            let listOutOfStockModified = listReceived.map(obj => {
                 if (obj.quantity !== 0) {
                     return { ...obj, cssClassName: "card0 release-0" };
                 }
@@ -79,7 +78,7 @@ const StickyBoard = (props) => {
 
             //setList(r.inventory)
         } else {
-            setList(r.paints)
+            setList(r)
             window.alert(JSON.stringify(localStorage.getItem("paints")))
         }
     })}, [refresh])
@@ -87,8 +86,8 @@ const StickyBoard = (props) => {
     //Click to delete or add paints 
     function onButtonClick (action) {
         if ("takeAway" === action) {
-            fetch("http://localhost:3080/paints/consume", {
-            method: "DELETE",
+            fetch("https://is21assignmentbe-ikc6zntdbq-wn.a.run.app/paints/consume", {
+            method: "PUT",
             headers: {
             'Content-Type': 'application/json'
           },
@@ -108,7 +107,7 @@ const StickyBoard = (props) => {
 
         // fill in stock
         if ("fillInStock" === action) {
-            fetch("http://localhost:3080/paints/provision", {
+            fetch("https://is21assignmentbe-ikc6zntdbq-wn.a.run.app/paints/provision", {
                 method: "PUT",
                 headers: {
                 'Content-Type': 'application/json'
@@ -125,7 +124,7 @@ const StickyBoard = (props) => {
             })
             .catch (error => console.error(error))
         }
-        alert ("Please confirm you will update:" + " paint color: " + selectVariable)
+        alert ("Please confirm you will update:" + " paint color: " + color)
         setSelectVariable("")
         setRefresh(refresh + 1);
     }
@@ -219,7 +218,7 @@ if (props.permission === "view and edit") {
         <div className="title">Paint Stocks Sticky Board</div>
         <div>
             <div className="swim-lane">
-                <div className="header">Available</div>
+                <div className="header">Available ( greater than 30)</div>
                 <div className="card2" >
                     <div className="map">{
                         listAvailable.map((item, index) => (
@@ -231,7 +230,7 @@ if (props.permission === "view and edit") {
                 </div>
             </div>                                
             <div className="swim-lane">
-                <div className="header">Low</div>
+                <div className="header">Low (0 - 30) </div>
                 <div className="card2">
                     <div className="map">{
                         listLow.map((item, index) => (
@@ -243,7 +242,7 @@ if (props.permission === "view and edit") {
                 </div>
             </div>                
             <div className="swim-lane">
-                <div className="header">Out of Stock</div>
+                <div className="header">Out of Stock (0) </div>
                 <div className="card2">
                     <div className="map">{
                         listOutOfStock.map((item, index) => (
@@ -262,7 +261,7 @@ if (props.permission === "view and edit") {
                 className={"inputButton"}
                 type="button"
                 onClick= {() => onButtonClick ('takeAway')}
-                value={"Take Away Paints"} />
+                value={"Consume Paints"} />
             
             <div className={"space"}/>
             
@@ -272,7 +271,7 @@ if (props.permission === "view and edit") {
                 onChange={ev => setTakeAwayNumber(ev.target.value)}
                 className={"inputBox"} />
             
-            <PaintDropdwon setSelectVariable={setSelectVariable}/>
+            <PaintDropdwon setColor={setColor}/>
 
         </div>
     </div>
@@ -285,7 +284,7 @@ if (props.permission === "view and edit") {
                     className={"inputButton"}
                     type="button"
                     onClick= {() => onButtonClick ('takeAway')}
-                    value={"Take Away Paints"} />
+                    value={"Consume Paints"} />
             
                 <div className={"space"}/>
             
@@ -302,7 +301,7 @@ if (props.permission === "view and edit") {
                     className={"inputButton"}
                     type="button"
                     onClick= {() => onButtonClick ("fillInStock")}
-                    value={"Fill In Stock"} />
+                    value={"Add Pain in Stocks"} />
 
                 <div className={"space"}/>
             

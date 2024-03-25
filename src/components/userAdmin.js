@@ -17,7 +17,7 @@ const UserAdmin = (props) => {
 
     //call back end for Users
     useEffect(() => {
-        fetch("http://localhost:3080/users", {
+        fetch("https://is21assignmentbe-ikc6zntdbq-wn.a.run.app/users", {
             method: "GET",
             headers: {
             'Content-Type': 'application/json'
@@ -33,14 +33,14 @@ const UserAdmin = (props) => {
             //props.setEmail(email)
             //navigate("/")
         } else {
-            setUsers(r.users)
+            setUsers(r)
             //window.alert(JSON.stringify(localStorage.getItem("users")))
         }
     })
 }, [])
     
 function onButtonClickDelete (name) {
-    let url = "http://localhost:3080/users/" + name
+    let url = "https://is21assignmentbe-ikc6zntdbq-wn.a.run.app/users/" + name
     fetch(url, {
         method: "Delete",
         headers: {
@@ -62,7 +62,7 @@ function onButtonClickDelete (name) {
 
 function onButtonClickUpdate (role, Permission, password) {
 
-    let url = "http://localhost:3080/users/" + name
+    let url = "https://is21assignmentbe-ikc6zntdbq-wn.a.run.app/users/" + name
     fetch(url, {
         method: "Put",
         headers: {
