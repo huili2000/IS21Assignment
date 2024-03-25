@@ -12,8 +12,8 @@ const UserAdmin = (props) => {
 
     const [users, setUsers] = useState([])
     const [password, setPassword] = useState([])
-    const [permission, setPermission] = useState([])
-    const [userName, setUserName] = useState("")
+    const [Permission, setPermission] = useState([])
+    const [name, setName] = useState("")
 
     //call back end for Users
     useEffect(() => {
@@ -40,13 +40,13 @@ const UserAdmin = (props) => {
 }, [])
     
 function onButtonClickDelete (name) {
-    
-    fetch("http://localhost:3080/user", {
+    let url = "http://localhost:3080/users/" + name
+    fetch(url, {
         method: "Delete",
         headers: {
         'Content-Type': 'application/json'
         },
-        body: JSON.stringify(name)
+        //body: JSON.stringify(name)
         })
         .then(r => r.json())
         .then(r => {
@@ -60,27 +60,27 @@ function onButtonClickDelete (name) {
         setRefresh(refresh + 1);
 }
 
-function onButtonClickUpdate () {
+function onButtonClickUpdate (role, Permission, password) {
 
-    
-    fetch("http://localhost:3080/user/permission", {
+    let url = "http://localhost:3080/users/" + name
+    fetch(url, {
         method: "Put",
         headers: {
        'Content-Type': 'application/json'
         },
-        body: JSON.stringify(userName, permission)
+        body: JSON.stringify(role, Permission, password)
         })
         .then(r => r.json())
         .then(r => {
             if ('success' === r.message) {
-                window.alert("delete this user successfully" + userName)
+                window.alert("delete this user successfully" + name)
             } else {
-                window.alert("delete this user unsuccessfully: " + userName)
+                window.alert("delete this user unsuccessfully: " + name)
             }
         })
         
         setRefresh(refresh + 1);
-        alert(userName + permission)
+        alert(name + Permission)
     }
 
 return (<div className={"mainContainer"}>
@@ -110,18 +110,18 @@ return (<div className={"mainContainer"}>
                 <div className={"inputButton"}>
                     <input
                         type="button"
-                        onClick= {() => onButtonClickUpdate ()}
+                        onClick= {() => onButtonClickUpdate ("admin", Permission, "admin")}
                         value={"Update Permission"} />
                 </div>
                 
                 <div className={"inputContainer"}>
                 <input
-                        value={userName}
+                        value={name}
                         placeholder="Enter your name"
-                        onChange={ev => setUserName(ev.target.value)}
+                        onChange={ev => setName(ev.target.value)}
                         className={"inputBox"} />
                     <input
-                        value={permission}
+                        value={Permission}
                         placeholder="Enter your permission to be updated"
                         onChange={ev => setPermission(ev.target.value)}
                         className={"inputBox"} />

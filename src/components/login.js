@@ -7,57 +7,14 @@ const Login = (props) => {
     const [emailError, setEmailError] = useState("")
 
     const [passwordError, setPasswordError] = useState("")
-    const [userName, setUserName] = useState("")
+    const [name, setName] = useState("")
     
     const navigate = useNavigate();
     
-    /**
-    const onButtonClick = () => {
-
-        // Set initial error values to empty
-        setEmailError("")
-        setPasswordError("")
-
-        // Check if the user has entered both fields correctly
-        if ("" === email) {
-            setEmailError("Please enter your email")
-            return
-        }
-
-        if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
-            setEmailError("Please enter a valid email")
-            return
-        }
-
-        if ("" === password) {
-            setPasswordError("Please enter a password")
-            return
-        }
-
-        if (password.length < 7) {
-            setPasswordError("The password must be 8 characters or longer")
-            return
-        }
-
-        // Check if email has an account associated with it
-        checkAccountExists(accountExists => {
-            // If yes, log in 
-            if (accountExists)
-                logIn()
-            else
-            // Else, ask user if they want to create a new account and if yes, then log in
-                if (window.confirm("An account does not exist with this email address: " + email + ". Do you want to create a new account?")) {
-                    logIn()
-                }
-        })        
-  
-
-    }*/
-
     const onButtonClick = () => {
 
         // Check if the user has entered both fields correctly
-        if ("" === userName) {
+        if ("" === name) {
             setEmailError("Please enter your user name")
             return
         }
@@ -75,11 +32,11 @@ const Login = (props) => {
         // Check if  an account exist
         checkAccountExists(accountExists => {
             // If yes, log in 
-            if (accountExists)
+            if (accountExists){
                 logIn()
-            else
+            }else
             // Else, ask user if they want to create a new account and if yes, then log in
-                if (window.confirm("An account does not exist with this user name: " + userName + ". Do you want to create a new account?")) {
+                if (window.confirm("An account does not exist with this user name: " + name + ". Do you want to create a new account?")) {
                     logIn()
                 }
         })        
@@ -89,28 +46,32 @@ const Login = (props) => {
 
     // Call the server API to check if the user name already exists
     const checkAccountExists = (callback) => {
-        fetch("http://localhost:3080/user", {
-            method: "POST",
+        //fetch("http://localhost:3080/auth-user", {
+        fetch("https://painttest-33nsvrx5ka-uc.a.run.app/auth-user", { 
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
               },
-            body: JSON.stringify({userName})
+            body: JSON.stringify({name, password})
         })
         .then(r => r.json())
         .then(r => {
-           // callback(r?.userExists)
-            callback(r.painter.length >= 1)
+            //callback(r?.userExists)
+           callback(r.painter.length >= 1)
         })
+        .catch ((error) => console.error(error))
     }
 
     // Log in a user using email and password
     const logIn = () => {
-        fetch("http://localhost:3080/auth-user", {
-            method: "POST",
+        //fetch("http://localhost:3080/auth-user", {
+            fetch("https://painttest-33nsvrx5ka-uc.a.run.app/auth-user", {  
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
               },
-            body: JSON.stringify({userName, password})
+
+            body: JSON.stringify({name, password})
         })
         .then(r => r.json())
         .then(r => {
@@ -126,6 +87,7 @@ const Login = (props) => {
                 navigate("/userAdmin", props)
             }
         })
+        .catch (error => console.error(error))
     }
 
     // return method
@@ -136,9 +98,9 @@ const Login = (props) => {
         <br />
         <div className={"inputContainer"}>
             <input
-                value={userName}
+                value={name}
                 placeholder="Enter your user name here"
-                onChange={ev => setUserName(ev.target.value)}
+                onChange={ev => setName(ev.target.value)}
                 className={"inputBox"} />
         </div>
         <br />

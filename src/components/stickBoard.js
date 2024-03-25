@@ -20,10 +20,13 @@ const StickyBoard = (props) => {
     const [takeAwayNumber, setTakeAwayNumber] = useState(0)
     const [fillInNumber, setFillInNumber] = useState(0)
 
+    const [color, setColor] = useState();
+    const [quantity, setQuantity] = useState();
+
    
     //call back end for stock inventory
     useEffect(() => {
-        fetch("http://localhost:3080/inventory", {
+        fetch("http://localhost:3080/paints", {
             method: "GET",
             headers: {
             'Content-Type': 'application/json'
@@ -32,25 +35,39 @@ const StickyBoard = (props) => {
     })
     .then(r => r.json())
     .then(r => {
-        if (0 < (r.inventory).length) {
-            let receivedInventory = r.inventory;
-             
+        if (0 < (r.paints).length) {
+            let receivedInventory = r.paints;
+            
+            receivedInventory = receivedInventory.map (obj => {
+                if(obj.color === 'blue') {
+                    return {...obj, cssClassName: "card release-1"}
+                } else if (obj.color === 'grey'){
+                    return {...obj, cssClassName: "card release-2"}    
+                } else if (obj.color === 'black'){
+                    return {...obj, cssClassName: "card release-3"}    
+                } else if (obj.color === 'white'){
+                    return {...obj, cssClassName: "card release-4"}    
+                } else if (obj.color === 'purple'){
+                    return {...obj, cssClassName: "card release-5"}    
+                }
+            })
+            
             let listAvailableModified = receivedInventory.map(obj => {
-                if (obj.number < 30) {
+                if (obj.quantity < 30) {
                     return { ...obj, cssClassName: "card0 release-0" };
                 }
                 return obj;
             });
 
             let listLowModified = receivedInventory.map(obj => {
-                if ((obj.number > 30) || (obj.number === 0) ) {
+                if ((obj.quantity > 30) || (obj.quantity === 0) ) {
                     return { ...obj, cssClassName: "card0 release-0" };
                 }
                 return obj;
             });
 
             let listOutOfStockModified = receivedInventory.map(obj => {
-                if (obj.number !== 0) {
+                if (obj.quantity !== 0) {
                     return { ...obj, cssClassName: "card0 release-0" };
                 }
                 return obj;
@@ -62,20 +79,20 @@ const StickyBoard = (props) => {
 
             //setList(r.inventory)
         } else {
-            setList(r.inventory)
-            window.alert(JSON.stringify(localStorage.getItem("inventory")))
+            setList(r.paints)
+            window.alert(JSON.stringify(localStorage.getItem("paints")))
         }
     })}, [refresh])
     
     //Click to delete or add paints 
     function onButtonClick (action) {
         if ("takeAway" === action) {
-            fetch("http://localhost:3080/inventory", {
+            fetch("http://localhost:3080/paints/consume", {
             method: "DELETE",
             headers: {
             'Content-Type': 'application/json'
           },
-            body: JSON.stringify({takeAwayNumber, selectVariable})
+            body: JSON.stringify({quantity, color})
         })
         .then(r => r.json())
         .then(r => {
@@ -85,16 +102,18 @@ const StickyBoard = (props) => {
             } else {
                 console.log("delete paint stocks unsuccessfully")
             }
-        })}
+            })
+            .catch (error => console.error(error))
+        }
 
         // fill in stock
         if ("fillInStock" === action) {
-            fetch("http://localhost:3080/inventory", {
+            fetch("http://localhost:3080/paints/provision", {
                 method: "PUT",
                 headers: {
                 'Content-Type': 'application/json'
               },
-                body: JSON.stringify({fillInNumber, selectVariable})
+                body: JSON.stringify({quantity, color})
             })
             .then(r => r.json())
             .then(r => {
@@ -103,7 +122,9 @@ const StickyBoard = (props) => {
                 } else {
                     console.log("add paint stock unsuccessfully")
                 }
-        })}
+            })
+            .catch (error => console.error(error))
+        }
         alert ("Please confirm you will update:" + " paint color: " + selectVariable)
         setSelectVariable("")
         setRefresh(refresh + 1);
@@ -119,7 +140,7 @@ if (props.permission === "view and edit") {
                     <div className="map">{
                         listAvailable.map((item, index) => (
                             <div className="column">
-                            <div className={item.cssClassName}>{item.color} {item.number}</div>
+                            <div className={item.cssClassName}>{item.color} {item.quantity}</div>
                         </div>
                         ))}
                     </div>
@@ -131,7 +152,7 @@ if (props.permission === "view and edit") {
                     <div className="map">{
                         listLow.map((item, index) => (
                             <div className="column">
-                            <div className={item.cssClassName}>{item.color} {item.number}</div>
+                            <div className={item.cssClassName}>{item.color} {item.quantity}</div>
                         </div>
                         ))}
                     </div>
@@ -143,7 +164,7 @@ if (props.permission === "view and edit") {
                     <div className="map">{
                         listOutOfStock.map((item, index) => (
                             <div className="column">
-                                <div className={item.cssClassName}>{item.color} {item.number}</div>
+                                <div className={item.cssClassName}>{item.color} {item.quantity}</div>
                             </div>
                         ))}
                     </div>
@@ -164,10 +185,10 @@ if (props.permission === "view and edit") {
             <input
                 value={takeAwayNumber}
                 placeholder="Enter your take away here"
-                onChange={ev => setTakeAwayNumber(ev.target.value)}
+                onChange={ev => setQuantity(ev.target.value)}
                 className={"inputBox"} />
             
-            <PaintDropdwon setSelectVariable={setSelectVariable}/>
+            <PaintDropdwon setColor={setColor}/>
         </div>
         
         <br/>                    
@@ -183,10 +204,10 @@ if (props.permission === "view and edit") {
             <input
                 value={fillInNumber}
                 placeholder="Enter your fill in number"
-                onChange={ev => setFillInNumber(ev.target.value)}
+                onChange={ev => setQuantity(ev.target.value)}
                 className={"inputBox"}/>
         
-            <PaintDropdwon setSelectVariable={setSelectVariable}/>
+            <PaintDropdwon setColor={setColor}/>
 
             
         
@@ -203,7 +224,7 @@ if (props.permission === "view and edit") {
                     <div className="map">{
                         listAvailable.map((item, index) => (
                             <div className="column">
-                            <div className={item.cssClassName}>{item.color} {item.number}</div>
+                            <div className={item.cssClassName}>{item.color} {item.quantity}</div>
                         </div>
                         ))}
                     </div>
@@ -215,7 +236,7 @@ if (props.permission === "view and edit") {
                     <div className="map">{
                         listLow.map((item, index) => (
                             <div className="column">
-                            <div className={item.cssClassName}>{item.color} {item.number}</div>
+                            <div className={item.cssClassName}>{item.color} {item.quantity}</div>
                         </div>
                         ))}
                     </div>
@@ -227,7 +248,7 @@ if (props.permission === "view and edit") {
                     <div className="map">{
                         listOutOfStock.map((item, index) => (
                             <div className="column">
-                                <div className={item.cssClassName}>{item.color} {item.number}</div>
+                                <div className={item.cssClassName}>{item.color} {item.quantity}</div>
                             </div>
                         ))}
                     </div>

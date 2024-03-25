@@ -14,7 +14,7 @@ function PaintDropdwon(props) {
  
   function handleOnChange (e) {
     setSelectedValue(e.target.value)
-    props.setSelectVariable(e.target.value)
+    props.setColor(e.target.value)
   }
  
   return ( 
@@ -30,19 +30,5 @@ function PaintDropdwon(props) {
   ); 
 } 
 
-  /**
-  return ( 
-    <select 
-      value={selectedValue} 
-      onChange={e => setSelectedValue(e.target.value)} 
-    > 
-      {options.map(option => ( 
-        <option key={option.value} value={option.value}> 
-          {option.label} 
-        </option> 
-      ))} 
-    </select> 
-  ); 
-} 
- */
+
 export default PaintDropdwon; 
